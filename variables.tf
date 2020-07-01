@@ -15,9 +15,9 @@ variable "tags" {
   default     = {}
 }
 
-variable "project" {
-  description = "The project"
-  default     = "default"
+variable "prefix_resource" {
+  description = "The prefix used for all created resources"
+  default     = ""
   type        = string
 }
 

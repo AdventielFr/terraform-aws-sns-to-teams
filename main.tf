@@ -7,7 +7,8 @@ terraform {
 data "aws_caller_identity" "current" {}
 
 locals {
-  function_name = "${var.project}-sns-to-teams"
+  prefix = var.prefix_resource != "" ? "${var.prefix_resource}-" : ""
+  function_name = "${local.prefix}sns-to-teams"
   tags          = merge(var.tags, map("Lambda", local.function_name))
 }
 
@@ -80,7 +81,7 @@ resource "aws_iam_policy" "this" {
 }
 
 resource "aws_iam_role" "this" {
-  name               = "${local.function_name}role"
+  name               = "${local.function_name}-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
