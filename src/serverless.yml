@@ -1,0 +1,58 @@
+
+service: sns-to-teams
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+
+provider:
+  name: aws
+  runtime: python3.8
+  timeout: 5
+  memorySize: 128
+  logRetentionInDays: 7
+  region: ${opt:region, 'eu-west-1'}
+
+plugins:
+  - serverless-iam-roles-per-function
+  - serverless-plugin-log-retention
+  - serverless-python-requirements
+  - serverless-pseudo-parameters
+package:
+  exclude:
+    - node_modules/**
+    - samples/**
+    - bin/**
+    - include/**
+    - lib/**
+    - .vscode/
+    - env/
+    - .gitignore
+
+functions:
+  cloudwatchAlarmsToTeams:
+    name: cloudwatchAlarmsToTeams
+    timeout: 300
+    memorySize: 120
+    description: send SNS topic message to Microsoft Teams
+    handler: handler.main
+    iamRoleStatementsName: sns-to-teams-role
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - iam:CreateAccessKey
+          - iam:DeleteAccessKey
+          - iam:GetLoginProfile
+          - iam:GetUser
+          - iam:ListAccessKeys
+          - iam:ListUsers
+          - iam:UpdateLoginProfile
+          - iam:ListUserTags
+        Resource: "*"
+      - Effect: Allow
+        Action:
+          - sns:Publish
+        Resource: "*"
+    environment:
+      TEAMS_WEBBOOK_URL: "https:/...."
+      TEAMS_IMAGE_URL: "https://..."
