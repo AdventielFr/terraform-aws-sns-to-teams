@@ -28,7 +28,7 @@ variable "teams_webhook_url" {
 
 variable "teams_image_url" {
   description = "The URL of image in Microsoft Teams notification"
-  default     = "https://cdn2.iconfinder.com/data/icons/amazon-aws-stencils/100/Deployment__Management_copy_CloudWatch_Alarm-512.png"
+  default     = "https://cdn2.iconfinder.com/data/icons/amazon-aws-stencils/100/Compute__Networking_copy_Amazon_VPC_Internet_Gateway-512.png"
   type        = string
 }
 
@@ -36,4 +36,10 @@ variable "cloudwatch_log_retention" {
   description = "The cloudwatch log retention ( default 7 days )."
   default     = 7
   type        = number
+}
+
+variable "sns_arn" {
+  description = "The ARN of SNS topic to used if the module doesn't create it"
+  default = ""
+  type = string
 }

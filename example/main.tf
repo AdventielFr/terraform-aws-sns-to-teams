@@ -7,7 +7,7 @@ module "example" {
   source                   = "../"
   aws_region               = "eu-west-3"
   cloudwatch_log_retention = 7
-  teams_webhook_url =  "<https:// microsoft teams webhook url>"
+  teams_webhook_url =  "<https:// teams webhook url>"
   prefix_resource = "dev-sample"
   tags = {
     Environment = "dev"

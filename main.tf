@@ -10,6 +10,7 @@ locals {
   prefix = var.prefix_resource != "" ? "${var.prefix_resource}-" : ""
   function_name = "${local.prefix}sns-to-teams"
   tags          = merge(var.tags, map("Lambda", local.function_name))
+  sns_arn = var.sns_arn == "" ? aws_sns_topic.this[0].arn: var.sns_arn
 }
 
 resource "aws_cloudwatch_log_group" "this" {
@@ -18,15 +19,24 @@ resource "aws_cloudwatch_log_group" "this" {
 }
 
 resource "aws_sns_topic" "this" {
+  count        = var.sns_arn == "" ? 1 : 0
   name         = local.function_name
   display_name = "Topic used to send sns topic message to Microsoft Teams channel"
   tags         = local.tags
 }
 
 resource "aws_sns_topic_subscription" "this" {
-  topic_arn = aws_sns_topic.this.arn
+  topic_arn = local.sns_arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.this.arn
+}
+
+resource "aws_lambda_permission" "with_sns" {
+  statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.this.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = local.sns_arn
 }
 
 resource "aws_lambda_function" "this" {
@@ -59,15 +69,16 @@ data "aws_iam_policy_document" "this" {
   statement {
     sid       = "AllowInvokingLambdas"
     effect    = "Allow"
-    resources = ["arn:aws:lambda:${var.aws_region}:*:function:*"]
+    resources = [
+      "arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:${local.function_name}"
+    ]
     actions   = ["lambda:InvokeFunction"]
   }
 
   statement {
     sid       = "AllowWritingLogs"
     effect    = "Allow"
-    resources = ["arn:aws:logs:${var.aws_region}:*:log-group:/aws/lambda/${local.function_name}*:*"]
-
+    resources = ["*"]
     actions = [
       "logs:CreateLogStream",
       "logs:PutLogEvents",
