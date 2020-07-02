@@ -37,9 +37,3 @@ variable "cloudwatch_log_retention" {
   default     = 7
   type        = number
 }
-
-variable "sns_arn" {
-  description = "The ARN of SNS topic to used if the module doesn't create it"
-  default = ""
-  type = string
-}

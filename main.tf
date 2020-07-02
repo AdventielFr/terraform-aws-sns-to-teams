@@ -10,7 +10,6 @@ locals {
   prefix = var.prefix_resource != "" ? "${var.prefix_resource}-" : ""
   function_name = "${local.prefix}sns-to-teams"
   tags          = merge(var.tags, map("Lambda", local.function_name))
-  sns_arn = var.sns_arn == "" ? aws_sns_topic.this[0].arn: var.sns_arn
 }
 
 resource "aws_cloudwatch_log_group" "this" {
@@ -19,7 +18,6 @@ resource "aws_cloudwatch_log_group" "this" {
 }
 
 resource "aws_sns_topic" "this" {
-  count        = var.sns_arn == "" ? 1 : 0
   name         = local.function_name
   display_name = "Topic used to send sns topic message to Microsoft Teams channel"
   tags         = local.tags
@@ -36,7 +34,7 @@ resource "aws_lambda_permission" "with_sns" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.this.function_name
   principal     = "sns.amazonaws.com"
-  source_arn    = local.sns_arn
+  source_arn    = aws_sns_topic.this.arn
 }
 
 resource "aws_lambda_function" "this" {
