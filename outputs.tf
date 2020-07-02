@@ -4,7 +4,7 @@ output "lambda_arn" {
 }
 
 output "sns_arn" {
-  value       = local.sns_arn
+  value       = aws_sns_topic.this.arn
   description = "The SNS ARN who send SNS topic message to Microsoft Teams"
 }
 
