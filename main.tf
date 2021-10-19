@@ -9,7 +9,7 @@ data "aws_caller_identity" "current" {}
 locals {
   prefix = var.prefix_resource != "" ? "${var.prefix_resource}-" : ""
   function_name = "${local.prefix}sns-to-teams"
-  tags          = merge(var.tags, map("Lambda", local.function_name))
+  tags          = merge(var.tags, tomap({"Lambda" = local.function_name}))
 }
 
 resource "aws_cloudwatch_log_group" "this" {
